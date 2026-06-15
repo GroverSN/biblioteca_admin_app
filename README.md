@@ -32,7 +32,7 @@ Se ha completado e implementado de manera robusta toda la lógica funcional de l
 ## 📈 Lógica del Flujo del Sistema
 Este diagrama ilustra cómo el sistema gestiona la interacción del usuario con los datos, asegurando una experiencia estable mediante la sincronización de estados:
 
-![Flujo del Sistema](assets/Logica_del_Flujo_del_Sistema.png)
+![Flujo del Sistema](assets/Logica%del%Flujo%del%Sistema.png)
 
 ---
 
