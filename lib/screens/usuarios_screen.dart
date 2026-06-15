@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:biblioteca_admin_app/models/usuario.dart';
+import '../widgets/usuario_card.dart';
 
 class UsuariosScreen extends StatefulWidget {
   const UsuariosScreen({super.key});
@@ -39,6 +40,20 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
               u.nombre.toLowerCase().contains(query.toLowerCase()) ||
               u.id.toLowerCase().contains(query.toLowerCase())
               ).toList();
+      }
+    });
+  }
+
+  void _runFilter(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredUsuarios = List.from(_allUsuarios);
+      } else {
+        _filteredUsuarios = _allUsuarios
+            .where((u) =>
+                u.nombre.toLowerCase().contains(query.toLowerCase()) ||
+                u.id.toLowerCase().contains(query.toLowerCase()))
+            .toList();
       }
     });
   }
@@ -156,6 +171,7 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
         );
       },
     );
+    
   }
 
   @override
@@ -174,7 +190,7 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
             padding: const EdgeInsets.all(16.0),
             child: TextField(
               controller: _searchController,
-              onChanged: _filterUsuarios,
+              onChanged: (value) => _runFilter(value),
               decoration: InputDecoration(
                 hintText: 'Buscar por nombre o ID...',
                 prefixIcon: const Icon(Icons.search),
@@ -186,81 +202,26 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
           ),
           Expanded(
             child: _filteredUsuarios.isEmpty
-                ? const Center(child: Text('No hay usuarios que coincidan.'))
-                : ListView.builder(
-                    itemCount: _filteredUsuarios.length,
-                    itemBuilder: (context, index) {
-                      final usuario = _filteredUsuarios[index];
-                      final isAdmin = usuario.rol == 'Administrador';
-
-                      return AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: isDark ? Colors.black26 : Colors.black.withValues(alpha: 0.02),
-                              blurRadius: 4,
-                            )
-                          ],
-                        ),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.all(12),
-                          leading: CircleAvatar(
-                            backgroundColor: isAdmin ? Colors.red.withValues(alpha: 0.1) : Colors.teal.withValues(alpha: 0.1),
-                            child: Icon(isAdmin ? Icons.supervisor_account : Icons.person, color: isAdmin ? Colors.red : Colors.teal),
-                          ),
-                          title: Text(usuario.nombre, style: const TextStyle(fontWeight: FontWeight.bold)),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('ID: ${usuario.id}'),
-                              const SizedBox(height: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: isAdmin 
-                                      ? (isDark ? Colors.red[900]!.withValues(alpha: 0.3) : Colors.red[50]) 
-                                      : (isDark ? Colors.teal[900]!.withValues(alpha: 0.3) : Colors.teal[50]),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  usuario.rol,
-                                  style: TextStyle(
-                                      color: isAdmin 
-                                          ? (isDark ? Colors.red[200] : Colors.red[900]) 
-                                          : (isDark ? Colors.teal[200] : Colors.teal[900]),
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              )
-                            ],
-                          ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                  icon: const Icon(Icons.edit, color: Colors.orange),
-                                  onPressed: () => _mostrarFormulario(index: index)),
-                              IconButton(
-                                icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-                                onPressed: () {
-                                  setState(() {
-                                    _allUsuarios.remove(_filteredUsuarios[index]);
-                                    _filterUsuarios(_searchController.text);
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
+              ? const Center(child: Text('No hay usuarios que coincidan.'))
+              : ListView.builder(
+                itemCount: _filteredUsuarios.length,
+                itemBuilder: (context, index) {
+                  final usuario = _filteredUsuarios[index];
+          
+                  return UsuarioCard(
+                    usuario: usuario,
+                    onEdit: () => _mostrarFormulario(index: index),
+                    onDelete: () {
+                      setState(() {
+                        final originalIndex = _allUsuarios.indexOf(usuario);
+                        _allUsuarios.removeAt(originalIndex);
+                        _runFilter(_searchController.text);
+                      });
                     },
-                  ),
-          ),
+                  );
+                },
+              ),
+            ),
         ],
       ),
       floatingActionButton: FloatingActionButton(

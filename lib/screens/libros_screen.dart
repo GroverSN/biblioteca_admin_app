@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/libro.dart';
+import '../widgets/libro_card.dart';
 
 class LibrosScreen extends StatefulWidget {
   const LibrosScreen({super.key});
@@ -186,54 +187,23 @@ class _LibrosScreenState extends State<LibrosScreen> {
                     ),
                   )
                 : ListView.builder(
-                    itemCount: _filteredLibros.length,
                     itemBuilder: (context, index) {
-                      final libro = _filteredLibros[index];
-                      return Card(
-                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        elevation: 0,
-                        // Color adaptativo para las tarjetas de los libros
-                        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          leading: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(color: Colors.blue.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
-                            child: const Icon(Icons.menu_book, color: Colors.blue),
-                          ),
-                          title: Text(
-                            libro.titulo, 
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : Colors.black87,
-                            ),
-                          ),
-                          subtitle: Text(
-                            'Autor: ${libro.autor}\nCódigo: ${libro.codigo}',
-                            style: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
-                          ),
-                          isThreeLine: true,
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(icon: const Icon(Icons.edit, color: Colors.orange), onPressed: () => _mostrarFormulario(index: index)),
-                              IconButton(
-                                icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-                                onPressed: () {
-                                  setState(() {
-                                    _allLibros.remove(_filteredLibros[index]);
-                                    _filterLibros(_searchController.text);
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
+                       final libro = _filteredLibros[index];
+          
+                      return LibroCard(
+                        libro: libro,
+                        onEdit: () => _mostrarFormulario(index: index),
+                        onDelete: () {
+                          setState(() {
+                            final originalIndex = _allLibros.indexOf(libro);
+                            _allLibros.removeAt(originalIndex);
+                            _filteredLibros.removeAt(index); // Borrado síncrono seguro e inmediato
+                          });
+                        },
                       );
                     },
                   ),
-          ),
+            ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
