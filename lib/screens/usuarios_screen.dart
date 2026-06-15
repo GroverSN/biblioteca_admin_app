@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:biblioteca_admin_app/models/usuario.dart';
 
 class UsuariosScreen extends StatefulWidget {
   const UsuariosScreen({super.key});
@@ -8,13 +9,13 @@ class UsuariosScreen extends StatefulWidget {
 }
 
 class _UsuariosScreenState extends State<UsuariosScreen> {
-  final List<Map<String, String>> _allUsuarios = [
-    {'nombre': 'Grover Flores', 'rol': 'Administrador', 'id': 'ADM-01'},
-    {'nombre': 'Ana Martínez', 'rol': 'Auxiliar Técnico', 'id': 'AUX-02'},
-    {'nombre': 'Carlos Condori', 'rol': 'Auxiliar Técnico', 'id': 'AUX-03'},
+  final List<Usuario> _allUsuarios = [
+    Usuario(nombre: 'Grover Flores', rol: 'Administrador', id: 'ADM-01'),
+    Usuario(nombre: 'Ana Martínez', rol: 'Auxiliar Técnico', id: 'AUX-02'),
+    Usuario(nombre: 'Carlos Condori', rol: 'Auxiliar Técnico', id: 'AUX-03'),
   ];
 
-  List<Map<String, String>> _filteredUsuarios = [];
+  List<Usuario> _filteredUsuarios = [];
   final _searchController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
@@ -33,25 +34,26 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
       if (query.isEmpty) {
         _filteredUsuarios = _allUsuarios;
       } else {
-        _filteredUsuarios = _allUsuarios
-            .where((u) =>
-                u['nombre']!.toLowerCase().contains(query.toLowerCase()) ||
-                u['id']!.toLowerCase().contains(query.toLowerCase()))
-            .toList();
+        _filteredUsuarios = _allUsuarios;
+            _allUsuarios.where((u) =>
+              u.nombre.toLowerCase().contains(query.toLowerCase()) ||
+              u.id.toLowerCase().contains(query.toLowerCase())
+              ).toList();
       }
     });
   }
 
   void _mostrarFormulario({int? index}) {
-    if (index != null) {
-      _nombreController.text = _filteredUsuarios[index]['nombre']!;
-      _idController.text = _filteredUsuarios[index]['id']!;
-      _selectedRol = _filteredUsuarios[index]['rol']!;
-    } else {
-      _nombreController.clear();
-      _idController.clear();
-      _selectedRol = 'Auxiliar Técnico';
+     if (index != null) {
+        _nombreController.text = _filteredUsuarios[index].nombre;
+        _idController.text = _filteredUsuarios[index].id;
+        _selectedRol = _filteredUsuarios[index].rol;
+     } else {
+        _nombreController.clear();
+        _idController.clear();
+        _selectedRol = 'Auxiliar Técnico';
     }
+
 
     showDialog(
       context: context,
@@ -126,18 +128,20 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                     if (_formKey.currentState!.validate()) {
                       setState(() {
                         if (index == null) {
-                          _allUsuarios.add({
-                            'nombre': _nombreController.text,
-                            'rol': _selectedRol,
-                            'id': _idController.text,
-                          });
+                          _allUsuarios.add(
+                            Usuario(
+                              id: _idController.text,
+                              nombre: _nombreController.text,
+                              rol: _selectedRol!,
+                           ),
+                         );
                         } else {
-                          final originalIndex = _allUsuarios.indexOf(_filteredUsuarios[index]);
-                          _allUsuarios[originalIndex] = {
-                            'nombre': _nombreController.text,
-                            'rol': _selectedRol,
-                            'id': _idController.text,
-                          };
+                          final originalIndex = _allUsuarios.indexOf(_filteredUsuarios[index!]);
+                          _allUsuarios[originalIndex] = Usuario(
+                            id: _idController.text,
+                            nombre: _nombreController.text,
+                            rol: _selectedRol!,
+                          );
                         }
                         _filterUsuarios(_searchController.text);
                       });
@@ -187,7 +191,7 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                     itemCount: _filteredUsuarios.length,
                     itemBuilder: (context, index) {
                       final usuario = _filteredUsuarios[index];
-                      final isAdmin = usuario['rol'] == 'Administrador';
+                      final isAdmin = usuario.rol == 'Administrador';
 
                       return AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
@@ -209,11 +213,11 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                             backgroundColor: isAdmin ? Colors.red.withValues(alpha: 0.1) : Colors.teal.withValues(alpha: 0.1),
                             child: Icon(isAdmin ? Icons.supervisor_account : Icons.person, color: isAdmin ? Colors.red : Colors.teal),
                           ),
-                          title: Text(usuario['nombre']!, style: const TextStyle(fontWeight: FontWeight.bold)),
+                          title: Text(usuario.nombre, style: const TextStyle(fontWeight: FontWeight.bold)),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('ID: ${usuario['id']!}'),
+                              Text('ID: ${usuario.id}'),
                               const SizedBox(height: 8),
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -224,7 +228,7 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
-                                  usuario['rol']!,
+                                  usuario.rol,
                                   style: TextStyle(
                                       color: isAdmin 
                                           ? (isDark ? Colors.red[200] : Colors.red[900]) 

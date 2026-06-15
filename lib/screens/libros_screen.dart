@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../models/libro.dart';
 
 class LibrosScreen extends StatefulWidget {
   const LibrosScreen({super.key});
@@ -8,15 +9,13 @@ class LibrosScreen extends StatefulWidget {
 }
 
 class _LibrosScreenState extends State<LibrosScreen> {
-  // Lista original en memoria
-  final List<Map<String, String>> _allLibros = [
-    {'titulo': 'Cien años de soledad', 'autor': 'Gabriel García Márquez', 'codigo': 'INF-001'},
-    {'titulo': 'Don Quijote de la Mancha', 'autor': 'Miguel de Cervantes', 'codigo': 'INF-002'},
-    {'titulo': 'El resplandor', 'autor': 'Stephen King', 'codigo': 'INF-003'},
+  final List<Libro> _allLibros = [
+    Libro(codigo: 'LIB-01', titulo: 'Cien años de soledad', autor: 'Gabriel García Márquez'),
+    Libro(codigo: 'LIB-02', titulo: 'Don Quijote de la Mancha', autor: 'Miguel de Cervantes'),
+    Libro(codigo: 'LIB-03', titulo: 'El resplandor', autor: 'Stephen King'),
   ];
 
-  // Lista que se mostrará en pantalla según el filtro
-  List<Map<String, String>> _filteredLibros = [];
+  List<Libro> _filteredLibros = [];
   final _searchController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
@@ -38,8 +37,8 @@ class _LibrosScreenState extends State<LibrosScreen> {
       } else {
         _filteredLibros = _allLibros
             .where((libro) =>
-                libro['titulo']!.toLowerCase().contains(query.toLowerCase()) ||
-                libro['autor']!.toLowerCase().contains(query.toLowerCase()))
+                libro.titulo.toLowerCase().contains(query.toLowerCase()) ||
+                libro.autor.toLowerCase().contains(query.toLowerCase()))
             .toList();
     }
     });
@@ -48,9 +47,9 @@ class _LibrosScreenState extends State<LibrosScreen> {
   void _mostrarFormulario({int? index}) {
     // Si pasamos un index, estamos EDITANDO, cargamos los datos previos
     if (index != null) {
-      _tituloController.text = _filteredLibros[index]['titulo']!;
-      _autorController.text = _filteredLibros[index]['autor']!;
-      _codigoController.text = _filteredLibros[index]['codigo']!;
+      _tituloController.text = _filteredLibros[index].titulo;
+      _autorController.text = _filteredLibros[index].autor;
+      _codigoController.text = _filteredLibros[index].codigo;
     } else {
       _tituloController.clear();
       _autorController.clear();
@@ -115,21 +114,21 @@ class _LibrosScreenState extends State<LibrosScreen> {
               if (_formKey.currentState!.validate()) {
                 setState(() {
                   if (index == null) {
-                    // Crear nuevo
-                    _allLibros.add({
-                      'titulo': _tituloController.text,
-                      'autor': _autorController.text,
-                      'codigo': _codigoController.text,
-                    });
-                  } else {
-                    // Actualizar existente
-                    final originalIndex = _allLibros.indexOf(_filteredLibros[index]);
-                    _allLibros[originalIndex] = {
-                      'titulo': _tituloController.text,
-                      'autor': _autorController.text,
-                      'codigo': _codigoController.text,
-                    };
-                  }
+                  _allLibros.add(
+                  Libro(
+                    codigo: _codigoController.text,
+                    titulo: _tituloController.text,
+                    autor: _autorController.text,
+                  ),
+                );
+              } else {
+                  final originalIndex = _allLibros.indexOf(_filteredLibros[index!]);
+                  _allLibros[originalIndex] = Libro(
+                    codigo: _codigoController.text,
+                    titulo: _tituloController.text,
+                    autor: _autorController.text,
+                  );
+              }
                   _filterLibros(_searchController.text); // Refrescar filtro
                 });
                 Navigator.pop(context);
@@ -204,14 +203,14 @@ class _LibrosScreenState extends State<LibrosScreen> {
                             child: const Icon(Icons.menu_book, color: Colors.blue),
                           ),
                           title: Text(
-                            libro['titulo']!, 
+                            libro.titulo, 
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: isDark ? Colors.white : Colors.black87,
                             ),
                           ),
                           subtitle: Text(
-                            'Autor: ${libro['autor']!}\nCódigo: ${libro['codigo']!}',
+                            'Autor: ${libro.autor}\nCódigo: ${libro.codigo}',
                             style: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
                           ),
                           isThreeLine: true,
