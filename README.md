@@ -21,58 +21,38 @@ Se ha completado e implementado de manera robusta toda la lógica funcional de l
 
 ---
 
-## 📈 Lógica General del Flujo del Sistema
+## 🚀 Características Principales
+* **Gestión Síncrona:** Flujo de datos optimizado para evitar errores de memoria.
+* **Búsqueda en Tiempo Real:** Filtros dinámicos sin latencia.
+* **Modularidad:** Estructura limpia basada en componentes reutilizables (`widgets`).
+* **Seguridad:** Eliminación de datos basada en referencias de objetos, garantizando cero errores de índice.
 
-A continuación, se detalla de forma síncrona cómo viajan los datos desde que el usuario interactúa con la interfaz, realiza búsquedas en tiempo real, edita registros o elimina elementos de forma segura.
+---
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor U as Alejandro (Usuario/Admin)
-    participant UI as Pantalla Principal (Screens)
-    participant W as Widgets Personalizados (Cards)
-    participant LM as Listas en Memoria (_all/_filtered)
-    participant Form as Formulario (BottomSheet)
+## 📈 Lógica del Flujo del Sistema
+Este diagrama ilustra cómo el sistema gestiona la interacción del usuario con los datos, asegurando una experiencia estable mediante la sincronización de estados:
 
-    %% Inicio del Sistema
-    Note over U, LM: Inicialización del Sistema
-    U->>UI: Entra a Gestión (Usuarios / Inventario)
-    UI->>LM: Carga síncrona inicial (initState)
-    LM-->>UI: Devuelve elementos (ej. length = 3)
-    UI->>W: Renderiza tarjetas dinámicamente usando itemCount
+![Flujo del Sistema]()
 
-    %% Flujo de Búsqueda
-    Note over U, LM: Flujo de Búsqueda en Tiempo Real
-    U->>UI: Escribe en la barra de búsqueda
-    UI->>LM: Filtra elementos en _filteredList
-    LM-->>UI: Actualiza el estado (setState)
-    UI->>W: Redibuja solo las tarjetas coincidentes
+*(Nota: Asegúrate de subir la imagen de tu diagrama a una carpeta llamada `/assets` en tu repo y reemplazar la URL anterior por la ruta correcta, ej: `assets/flujo_sistema.png`)*
 
-    %% Flujo de Edición
-    Note over U, Form: Flujo de Edición de Datos
-    U->>W: Clic en botón Editar (Lápiz)
-    W->>UI: Dispara onEdit con el índice
-    UI->>Form: Despliega BottomSheet con datos precargados
-    U->>Form: Modifica datos y guarda
-    Form->>LM: Actualiza el objeto específico
-    LM-->>UI: Refresca la UI con los nuevos datos
+---
 
-    %% Flujo de Eliminación Seguro
-    Note over U, LM: Flujo de Eliminación Síncrono Seguro
-    U->>W: Clic en botón Eliminar (Basurero)
-    W->>UI: Dispara onDelete pasando el Objeto directo
-    UI->>LM: Remueve objeto de _allList y _filteredList
-    LM-->>UI: Reduce el length e invoca setState()
-    UI->>U: Desaparece la tarjeta de la pantalla (Cero errores)
+## 🛠️ Estructura Técnica
+Nuestro proyecto se organiza de la siguiente manera para facilitar el mantenimiento:
 
+- `lib/models/`: Definición de clases de datos (`Usuario`, `Libro`).
+- `lib/screens/`: Pantallas principales de gestión.
+- `lib/widgets/`: Componentes visuales independientes.
 
-   1.  **Modularidad y Acoplamiento Débil:** Se aplicó una arquitectura limpia dividiendo las responsabilidades. Separamos las pantallas de gestión (Screens) de los componentes visuales repeti tivos, encapsulando estos últimos en widgets personalizados independientes (UsuarioCard y LibroCard). Esto otorga un acoplamiento débil; si se decide cambiar el diseño de las tarjetas, no se altera la lógica de control de la pantalla.
+---
 
-   2. Manejo Seguro del Estado (Mitigación de RangeError): La lógica del flujo general se maneja de forma estrictamente síncrona mediante dos listas en memoria por pantalla: una lista maestra (_allList) y una lista de renderizado dinámico (_filteredList). El sistema asegura la estabilidad al sincronizar ambas listas en el initState y al asociar obligatoriamente la propiedad itemCount del ListView.builder al tamaño real de la lista filtrada.
+## 💡 Sustentación Técnica
+Para la defensa y documentación del proyecto, resaltamos tres pilares:
 
-   3. Eliminación por Referencia Directa: Al ejecutar una acción de eliminación, el widget delega el evento mediante un callback síncrono pasando directamente la referencia del objeto completo, y no su índice numérico. Al hacer .remove(objeto) dentro de un setState, ambas listas se actualizan y el árbol de widgets se redibuja recalculando el tamaño exacto al instante, lo que mitiga de raíz cualquier posibilidad de lanzar un error de índice fuera de rango (RangeError).
-
-   4. Optimización de la UI en Tiempo Real: El flujo contempla búsquedas en tiempo real. Cada interacción en la barra de filtrado ejecuta una función síncrona que reduce el tamaño de _filteredList. Flutter, al detectar el cambio de estado, redibuja únicamente las tarjetas afectadas en la interfaz, ofreciendo una experiencia de usuario sumamente fluida y reactiva.
+1. **Modularidad:** Acoplamiento débil mediante widgets independientes.
+2. **Estabilidad:** Uso de `itemCount` vinculado a listas filtradas para eliminar el `RangeError`.
+3. **Optimización:** Redibujado selectivo de componentes mediante `setState` al eliminar objetos por referencia.
 
 ---
 ## 🛠️ Flujo de Trabajo en Git / GitHub
