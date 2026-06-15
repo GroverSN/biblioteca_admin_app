@@ -4,6 +4,7 @@ Este proyecto contempla el desarrollo de las aplicaciones **Intermedia (Gestión
 
 ---
 
+
 ## 🚀 Estado Actual del Proyecto (Avance Implementado)
 
 Se ha completado e implementado de manera robusta toda la lógica funcional de las vistas principales, el control de temas y las interfaces del CRUD:
@@ -20,78 +21,60 @@ Se ha completado e implementado de manera robusta toda la lógica funcional de l
 
 ---
 
-## 🛠️ Instrucciones para el Integrante D
-
-**Rol Asignado:** Estructura de Datos y UI Avanzada.
-**Tu Misión:** Debes encapsular la lógica actual que se encuentra en variables locales emparejadas dentro de los componentes y abstraerla hacia **Modelos de Datos formalizados** y **Widgets modulares reutilizables** para limpiar y optimizar el código fuente.
-
-### 📦 Tareas Técnicas Requeridas:
-1. **Creación de Modelos (`lib/models/`):**
-   - `usuario.dart`: Definir la clase `Usuario` con atributos (`id`, `nombre`, `rol`) y un método constructor.
-   - `libro.dart`: Definir la clase `Libro` con atributos (`codigo`, `titulo`, `autor`) y un método constructor.
-2. **Abstracción de Listas Temporales:** Migrar las listas de mapas planos actuales (`List<Map<String, String>>`) hacia listas de objetos basados en tus nuevos modelos (`List<Usuario>` y `List<Libro>`).
-3. **Modularización de UI (`lib/widgets/`):** Extraer los componentes repetitivos o complejos como las tarjetas personalizadas de las listas (`ListTile` adaptativos) y los campos de entrada de texto estilizados (`TextFormField` con su padding interno) hacia archivos independientes en la carpeta de widgets para desacoplar el código de las pantallas.
-
----
-
-## 🤖 Prompts Guía para la Inteligencia Artificial (Copia y pega esto en tu IA)
-
-Para completar tus tareas de la misma manera limpia, precisa y estética en que se estructuró el código base, utiliza los siguientes prompts específicos con tu asistente de IA:
-
-### 🔹 Prompt 1: Creación de Modelos y Refactorización de Listas
-> *"Estoy trabajando en un proyecto de Flutter Web/Móvil que opera de forma autónoma en memoria interna. Actualmente las pantallas `usuarios_screen.dart` y `libros_screen.dart` manejan la información usando una lista estructurada como `List<Map<String, String>> _allUsuarios = [...]`. Necesito que crees el archivo de modelo independiente `lib/models/usuario.dart` con una clase limpia que maneje ID, Nombre y Rol. Explícame de forma muy precisa cómo debo cambiar el tipado en la pantalla principal de la lista de mapas a una lista de objetos de este nuevo modelo sin romper los métodos de filtrado síncronos de la barra de búsqueda."*
-
-### 🔹 Prompt 2: Modularización de Componentes de Interfaz
-> *"En mi pantalla de gestión de usuarios en Flutter, tengo un `ListView.builder` que renderiza tarjetas de personal utilizando un `AnimatedContainer` que cambia de color de fondo adaptándose dinámicamente si el tema es Dark o Light (`Theme.of(context).brightness`), además de badges de colores personalizados para los roles. Quiero extraer todo este ítem de la lista a un widget personalizado y reutilizable en `lib/widgets/usuario_card.dart`. Dame el código modular exacto asegurándote de pasarle las propiedades necesarias mediante el constructor para mantener la consistencia estética y que soporte el cambio de modo oscuro perfectamente."*
-
----
-
 ## 📈 Lógica General del Flujo del Sistema
 
-Para el documento explicativo de la entrega, la interacción lógica de las pantallas y el flujo de los datos en memoria se rige bajo la siguiente arquitectura:
+A continuación, se detalla de forma síncrona cómo viajan los datos desde que el usuario interactúa con la interfaz, realiza búsquedas en tiempo real, edita registros o elimina elementos de forma segura.
 
-┌─────────────────────────────┐
-                 │     DASHBOARD PRINCIPAL     │◄──────────────────┐
-                 │  (Menú de Navegación y      │                   │
-                 │   Control de Modo Oscuro)   │                   │
-                 └──────┬───────────────┬──────┘                   │
-                        │               │                          │
-    ┌───────────────────┘               └───────────────────┐      │
-    ▼ (Clic: Gestión Usuarios)                              ▼ (Clic: Inventario Libros)
-┌───────────────────────────────┐                       ┌───────────────────────────────┐
-│        usuarios_screen        │                       │         libros_screen         │
-│  (Lista de Personal Técnico)  │                       │ (Catálogo de Obras Físicas)   │
-└──────┬─────────────────┬──────┘                       └──────┬─────────────────┬──────┘
-│                 │                                     │                 │
-│                 │ (Filtrado Síncrono)                 │                 │ (Filtrado Síncrono)
-│                 ▼                                     │                 ▼
-│         [Caja de Búsqueda]                            │         [Caja de Búsqueda]
-│         Filtra por Nombre o ID                        │         Filtra por Título/Autor
-│                                                       │
-▼ (Clic: Botón "+" o "Editar")                          ▼ (Clic: Botón FAB o "Editar")
-┌───────────────────────────────┐                       ┌───────────────────────────────┐
-│  AlertDialog (Formulario UI)  │                       │  AlertDialog (Formulario UI)  │
-│  - Encapsulado en             │                       │  - Ancho Fijo de 400px        │
-│    StatefulBuilder            │                       │  - Espaciado Interno Amplio   │
-│  - Control de Rol (Dropdown)  │                       │  - Campos de Texto Validados  │
-└──────────────┬────────────────┘                       └──────────────┬────────────────┘
-│                                                       │
-▼ (Clic: Registrar/Actualizar)                          ▼ (Clic: Guardar/Actualizar)
-┌─────────────────────────────┐                         ┌─────────────────────────────┐
-│  - Valida Campos del Form   │                         │  - Valida Campos del Form   │
-│  - Inserta/Modifica el Mapa │                         │  - Inserta/Modifica el Mapa │
-│    en la Lista Local        │                         │    en la Lista Local        │
-│  - Cierra Cuadro de Diálogo │                         │  - Cierra Cuadro de Diálogo │
-└─────────────┬───────────────┘                         └─────────────┬───────────────┘
-│                                                       │
-└─────────────────►[ Retorna el Foco ]◄─────────────────┘
-(Redibuja la UI con los
-nuevos datos en memoria)
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Alejandro (Usuario/Admin)
+    participant UI as Pantalla Principal (Screens)
+    participant W as Widgets Personalizados (Cards)
+    participant LM as Listas en Memoria (_all/_filtered)
+    participant Form as Formulario (BottomSheet)
 
-> 💡 **Nota para la Documentación:** Para generar el diagrama vectorial del informe final, ingresa a [mermaid.live](https://mermaid.live/), pega el bloque de código que se encuentra documentado en la bitácora de desarrollo interna, ajústate a los estilos azul/teal institucionales y descarga la imagen en alta definición (PNG) para incluirla en la sección 3 del PDF del grupo.
+    %% Inicio del Sistema
+    Note over U, LM: Inicialización del Sistema
+    U->>UI: Entra a Gestión (Usuarios / Inventario)
+    UI->>LM: Carga síncrona inicial (initState)
+    LM-->>UI: Devuelve elementos (ej. length = 3)
+    UI->>W: Renderiza tarjetas dinámicamente usando itemCount
+
+    %% Flujo de Búsqueda
+    Note over U, LM: Flujo de Búsqueda en Tiempo Real
+    U->>UI: Escribe en la barra de búsqueda
+    UI->>LM: Filtra elementos en _filteredList
+    LM-->>UI: Actualiza el estado (setState)
+    UI->>W: Redibuja solo las tarjetas coincidentes
+
+    %% Flujo de Edición
+    Note over U, Form: Flujo de Edición de Datos
+    U->>W: Clic en botón Editar (Lápiz)
+    W->>UI: Dispara onEdit con el índice
+    UI->>Form: Despliega BottomSheet con datos precargados
+    U->>Form: Modifica datos y guarda
+    Form->>LM: Actualiza el objeto específico
+    LM-->>UI: Refresca la UI con los nuevos datos
+
+    %% Flujo de Eliminación Seguro
+    Note over U, LM: Flujo de Eliminación Síncrono Seguro
+    U->>W: Clic en botón Eliminar (Basurero)
+    W->>UI: Dispara onDelete pasando el Objeto directo
+    UI->>LM: Remueve objeto de _allList y _filteredList
+    LM-->>UI: Reduce el length e invoca setState()
+    UI->>U: Desaparece la tarjeta de la pantalla (Cero errores)
+
+
+   1.  **Modularidad y Acoplamiento Débil:** Se aplicó una arquitectura limpia dividiendo las responsabilidades. Separamos las pantallas de gestión (Screens) de los componentes visuales repeti tivos, encapsulando estos últimos en widgets personalizados independientes (UsuarioCard y LibroCard). Esto otorga un acoplamiento débil; si se decide cambiar el diseño de las tarjetas, no se altera la lógica de control de la pantalla.
+
+   2. Manejo Seguro del Estado (Mitigación de RangeError): La lógica del flujo general se maneja de forma estrictamente síncrona mediante dos listas en memoria por pantalla: una lista maestra (_allList) y una lista de renderizado dinámico (_filteredList). El sistema asegura la estabilidad al sincronizar ambas listas en el initState y al asociar obligatoriamente la propiedad itemCount del ListView.builder al tamaño real de la lista filtrada.
+
+   3. Eliminación por Referencia Directa: Al ejecutar una acción de eliminación, el widget delega el evento mediante un callback síncrono pasando directamente la referencia del objeto completo, y no su índice numérico. Al hacer .remove(objeto) dentro de un setState, ambas listas se actualizan y el árbol de widgets se redibuja recalculando el tamaño exacto al instante, lo que mitiga de raíz cualquier posibilidad de lanzar un error de índice fuera de rango (RangeError).
+
+   4. Optimización de la UI en Tiempo Real: El flujo contempla búsquedas en tiempo real. Cada interacción en la barra de filtrado ejecuta una función síncrona que reduce el tamaño de _filteredList. Flutter, al detectar el cambio de estado, redibuja únicamente las tarjetas afectadas en la interfaz, ofreciendo una experiencia de usuario sumamente fluida y reactiva.
 
 ---
-
 ## 🛠️ Flujo de Trabajo en Git / GitHub
 
 Para descargar el código que acabo de subir, integrar tus cambios y mantener el repositorio sincronizado sin conflictos, sigue estrictamente estos comandos en tu terminal de Git:
