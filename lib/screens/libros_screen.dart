@@ -27,7 +27,7 @@ class _LibrosScreenState extends State<LibrosScreen> {
   @override
   void initState() {
     super.initState();
-    _filteredLibros = _allLibros; // Al inicio muestra todos
+    _filteredLibros = List.from(_allLibros); // Al inicio muestra todos
   }
 
   // Lógica interna de filtrado en memoria
@@ -187,6 +187,7 @@ class _LibrosScreenState extends State<LibrosScreen> {
                     ),
                   )
                 : ListView.builder(
+                    itemCount: _filteredLibros.length,
                     itemBuilder: (context, index) {
                        final libro = _filteredLibros[index];
           
@@ -195,9 +196,8 @@ class _LibrosScreenState extends State<LibrosScreen> {
                         onEdit: () => _mostrarFormulario(index: index),
                         onDelete: () {
                           setState(() {
-                            final originalIndex = _allLibros.indexOf(libro);
-                            _allLibros.removeAt(originalIndex);
-                            _filteredLibros.removeAt(index); // Borrado síncrono seguro e inmediato
+                            _allLibros.remove(libro);
+                            _filteredLibros.remove(libro); // Borrado síncrono seguro e inmediato
                           });
                         },
                       );
